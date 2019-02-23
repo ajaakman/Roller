@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Rewinder.h"
 #include "Ball.generated.h"
 
 UCLASS()
@@ -72,8 +73,8 @@ public:
 
 protected:
 
-	//void RewindStart();
-	//void RewindEnd();
+	void RewindStart();
+	void RewindEnd();
 
 	virtual void BeginPlay() override;
 
@@ -83,7 +84,9 @@ public:
 
 public:
 
-	//UFUNCTION(BlueprintPure, Category = "Rewind")
-	//uint8 GetRemainingRewind();
+	UFUNCTION(BlueprintPure, Category = "Rewind")
+	uint8 GetRemainingRewind();
+
+	Rewinder m_Rewinder;
 
 };

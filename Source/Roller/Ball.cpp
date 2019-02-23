@@ -48,18 +48,33 @@ ABall::ABall()
 	bCanJump = true; // Start being able to jump
 }
 
+void ABall::RewindStart()
+{
+	m_Rewinder.SetRewindState(true);
+}
+
+void ABall::RewindEnd()
+{
+	m_Rewinder.SetRewindState(false);
+}
+
 void ABall::BeginPlay()
 {
 	Super::BeginPlay();
-	//RewindInit(this->Ball, this);
+	m_Rewinder.RewindInit(this->Ball, this);
 }
 
 void ABall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	//MoveForward(1.0f);
-	//if (!s_ui8RemainingRewind) RewindEnd();
-	//RewindTick(DeltaTime, this->Ball, this);
+	if (!(m_Rewinder.GetRewind())) RewindEnd();
+	m_Rewinder.RewindTick(DeltaTime, this->Ball, this);
+}
+
+uint8 ABall::GetRemainingRewind()
+{
+	return m_Rewinder.GetRewind();
 }
 
 // Called to bind functionality to input
@@ -70,8 +85,8 @@ void ABall::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("MoveForward", this, &ABall::MoveForward);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ABall::Jump);
-	//PlayerInputComponent->BindAction("Rewind", IE_Pressed, this, &ABall::RewindStart);
-	//PlayerInputComponent->BindAction("Rewind", IE_Released, this, &ABall::RewindEnd);
+	PlayerInputComponent->BindAction("Rewind", IE_Pressed, this, &ABall::RewindStart);
+	PlayerInputComponent->BindAction("Rewind", IE_Released, this, &ABall::RewindEnd);
 
 	// handle touch devices
 	PlayerInputComponent->BindTouch(IE_Pressed, this, &ABall::TouchStarted);
@@ -109,22 +124,24 @@ void ABall::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, cl
 
 void ABall::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {
-	if (bCanJump)
+	RewindStart();
+	/*if (bCanJump)
 	{
 		const FVector Impulse = FVector(0.f, 0.f, JumpImpulse);
 		Ball->AddImpulse(Impulse);
 		bCanJump = false;
-	}
+	}*/
 
 }
 
 void ABall::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
-	if (bCanJump)
+	RewindEnd();
+	/*if (bCanJump)
 	{
 		const FVector Impulse = FVector(0.f, 0.f, JumpImpulse);
 		Ball->AddImpulse(Impulse);
 		bCanJump = false;
-	}
+	}*/
 }
 
