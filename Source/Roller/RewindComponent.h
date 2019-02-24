@@ -2,28 +2,43 @@
 
 #pragma once
 
+#include <memory>
 #include "CoreMinimal.h"
+#include "Components/ActorComponent.h"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
-#include <memory>
+#include "RewindComponent.generated.h"
 
-/**
- * 
- */
-class ROLLER_API Rewinder
+
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+class ROLLER_API URewindComponent : public UActorComponent
 {
-public:
-	Rewinder();
-	~Rewinder();
+	GENERATED_BODY()
 
+public:	
+	// Sets default values for this component's properties
+	URewindComponent();
+
+	UFUNCTION(BlueprintCallable, Category = "Rewind")
 	uint8 GetRewind();
 
-	void RewindInit(UStaticMeshComponent* mesh, AActor* actor);
-	void RewindTick(float deltaTime, UStaticMeshComponent* mesh, AActor* actor);
-
+	UFUNCTION(BlueprintCallable, Category = "Rewind")
+	void SetRewindMesh(UStaticMeshComponent* mesh);
+	
+	UFUNCTION(BlueprintCallable, Category = "Rewind")
 	static void SetRewindState(bool bNewRewindState);
 
+protected:
+
+	virtual void BeginPlay() override;
+
+public:
+
+	virtual void TickComponent(float fDeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 private:
+	UStaticMeshComponent* m_pParentMesh;
+
 	const static uint8 s_ui8TRACKED_VALUES_SIZE = 255; // Size of the arrays that track our values.
 	const static float s_fREFRESH_RATE; // How many times per second the values are tracked.
 
@@ -36,5 +51,5 @@ private:
 	const std::unique_ptr<FVector[]> m_arrTrackedLocation = std::make_unique<FVector[]>(s_ui8TRACKED_VALUES_SIZE + 1); // Vector array that tracks the position of the parent object.	
 	const std::unique_ptr<FQuat[]> m_arrTrackedRotation = std::make_unique<FQuat[]>(s_ui8TRACKED_VALUES_SIZE + 1); // Quaterion array that tracks the rotation of the parent object.		
 	const std::unique_ptr<FVector[]> m_arrTrackedLinearVelocity = std::make_unique<FVector[]>(s_ui8TRACKED_VALUES_SIZE + 1); // Quaterion array that tracks the rotation of the parent object.		
-	const std::unique_ptr<FVector[]> m_arrTrackedAngularVelocity = std::make_unique<FVector[]>(s_ui8TRACKED_VALUES_SIZE + 1); // Quaterion array that tracks the rotation of the parent object.
+	const std::unique_ptr<FVector[]> m_arrTrackedAngularVelocity = std::make_unique<FVector[]>(s_ui8TRACKED_VALUES_SIZE + 1); // Quaterion array that tracks the rotation of the parent object.	
 };

@@ -4,6 +4,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "RewindComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Engine/CollisionProfile.h"
@@ -42,6 +43,8 @@ ABall::ABall()
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	Camera->bUsePawnControlRotation = false; // We don't want the controller rotating the camera
 
+	m_Rewinder = CreateDefaultSubobject<URewindComponent>(TEXT("Rewinder"));
+
 	// Set up forces
 	RollTorque = 50000000.0f;
 	JumpImpulse = 350000.0f;
@@ -50,31 +53,24 @@ ABall::ABall()
 
 void ABall::RewindStart()
 {
-	m_Rewinder.SetRewindState(true);
+	m_Rewinder->SetRewindState(true);
 }
 
 void ABall::RewindEnd()
 {
-	m_Rewinder.SetRewindState(false);
+	m_Rewinder->SetRewindState(false);
 }
 
 void ABall::BeginPlay()
 {
 	Super::BeginPlay();
-	m_Rewinder.RewindInit(this->Ball, this);
+	m_Rewinder->SetRewindMesh(Ball);
 }
 
 void ABall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	//MoveForward(1.0f);
-	if (!(m_Rewinder.GetRewind())) RewindEnd();
-	m_Rewinder.RewindTick(DeltaTime, this->Ball, this);
-}
-
-uint8 ABall::GetRemainingRewind()
-{
-	return m_Rewinder.GetRewind();
 }
 
 // Called to bind functionality to input
