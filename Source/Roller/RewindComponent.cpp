@@ -35,10 +35,12 @@ void URewindComponent::BeginPlay()
 void URewindComponent::TickComponent(float fDeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(fDeltaTime, TickType, ThisTickFunction);
-
 	if (!GetRewind()) SetRewindState(false);
 
+
 	s_fDeltaTime += fDeltaTime; // If the framerate changes this will allow us to run the following the correct number of times. The speed multiplier can create a speedup or slowmo effect.
+	//GetOwner()->GetRootComponent()->SetMobility(EComponentMobility::Stationary);
+	//GetOwner()->GetRootComponent()->SetMobility(EComponentMobility::Movable);
 
 	while (s_fDeltaTime >= s_fREFRESH_RATE) // This loop insures that our rewind is FPS independant. 
 	{
@@ -46,7 +48,6 @@ void URewindComponent::TickComponent(float fDeltaTime, ELevelTick TickType, FAct
 
 		if (s_bIsRewindActive)	// After incrementing set new position.
 		{
-
 			GetOwner()->SetActorLocationAndRotation(m_arrTrackedLocation[s_ui8HeadLocation], m_arrTrackedRotation[s_ui8HeadLocation], false, nullptr, ETeleportType::TeleportPhysics);
 			if (m_pParentMesh != nullptr)
 			{
@@ -58,14 +59,13 @@ void URewindComponent::TickComponent(float fDeltaTime, ELevelTick TickType, FAct
 		{
 			if (s_ui8RemainingRewind)
 			{
-				--s_ui8HeadLocation;
+				s_ui8HeadLocation ? s_ui8HeadLocation-- : s_ui8HeadLocation = s_ui8TRACKED_VALUES_SIZE - 1;				
 				--s_ui8RemainingRewind;
-			}
+			}			
 		}
 		else // If inactive increment loop.
 		{
-			++s_ui8HeadLocation;
-
+			s_ui8HeadLocation == s_ui8TRACKED_VALUES_SIZE - 1 ? s_ui8HeadLocation = 0 : s_ui8HeadLocation++;
 			if (s_ui8RemainingRewind != s_ui8TRACKED_VALUES_SIZE)// Should only go up to 255.				
 				++s_ui8RemainingRewind;
 		}
@@ -83,7 +83,7 @@ void URewindComponent::TickComponent(float fDeltaTime, ELevelTick TickType, FAct
 }
 
 void URewindComponent::SetRewindState(bool bNewRewindState)
-{
+{	
 	s_bIsRewindActive = bNewRewindState ? true : false;
 }
 

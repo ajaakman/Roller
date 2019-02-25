@@ -39,7 +39,7 @@ public:
 private:
 	UStaticMeshComponent* m_pParentMesh;
 
-	const static uint8 s_ui8TRACKED_VALUES_SIZE = 255; // Size of the arrays that track our values.
+	const static uint8 s_ui8TRACKED_VALUES_SIZE = 100; // Size of the arrays that track our values.
 	const static float s_fREFRESH_RATE; // How many times per second the values are tracked.
 
 	static bool s_bIsRewindActive; // Has the rewind loop been activated or not.
